@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Paragraph Word Count Comparison</title>
+    <style>
+        /* Basic styling */
+        .textarea-container {
+            display: inline-block;
+            vertical-align: top;
+            width: 45%;
+            margin: 0 2%;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            margin: 0 auto;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        /* Colors for increased, decreased, and unchanged word counts */
+        .increased {
+            background-color: #d4edda; /* Light green */
+            color: #155724; /* Dark green text */
+        }
+        .decreased {
+            background-color: #f8d7da; /* Light red */
+            color: #721c24; /* Dark red text */
+        }
+        .unchanged {
+            background-color: #fff3cd; /* Light yellow */
+            color: #856404; /* Dark yellow text */
+        }
+    </style>
+</head>
+<body>
+    <h1>Paragraph Word Count Comparison</h1>
+    <p>
+        <strong>Color Legend:</strong><br>
+        <span style="background-color:#d4edda;color:#155724;padding:2px;">Green</span>: Increase in word count<br>
+        <span style="background-color:#f8d7da;color:#721c24;padding:2px;">Red</span>: Decrease in word count<br>
+        <span style="background-color:#fff3cd;color:#856404;padding:2px;">Yellow</span>: No change in word count
+    </p>
+    <div class="textarea-container">
+        <label for="beforeText">Before Text:</label><br>
+        <textarea id="beforeText"></textarea>
+    </div>
+    <div class="textarea-container">
+        <label for="afterText">After Text:</label><br>
+        <textarea id="afterText"></textarea>
+    </div>
+    <button onclick="calculate()">Calculate Word Counts</button>
+    <div id="results"></div>
+    <script>
+        function calculate() {
+            var beforeText = document.getElementById('beforeText').value;
+            var afterText = document.getElementById('afterText').value;
+
+            // Split texts into paragraphs
+            var beforeParagraphs = splitIntoParagraphs(beforeText);
+            var afterParagraphs = splitIntoParagraphs(afterText);
+
+            // Get the maximum number of paragraphs
+            var maxParagraphs = Math.max(beforeParagraphs.length, afterParagraphs.length);
+
+            // Prepare HTML table
+            var html = '<table><tr><th>Paragraph</th><th>Before Word Count</th><th>After Word Count</th></tr>';
+
+            var totalBeforeWords = 0;
+            var totalAfterWords = 0;
+
+            for (var i = 0; i < maxParagraphs; i++) {
+                var beforeParagraph = beforeParagraphs[i] || '';
+                var afterParagraph = afterParagraphs[i] || '';
+
+                var beforeWordCount = countWords(beforeParagraph);
+                var afterWordCount = countWords(afterParagraph);
+
+                totalBeforeWords += beforeWordCount;
+                totalAfterWords += afterWordCount;
+
+                var className = '';
+                if (afterWordCount > beforeWordCount) {
+                    className = 'increased';
+                } else if (afterWordCount < beforeWordCount) {
+                    className = 'decreased';
+                } else {
+                    className = 'unchanged';
+                }
+
+                html += '<tr><td>' + (i+1) + '</td><td>' + beforeWordCount + '</td><td class="' + className + '">' + afterWordCount + '</td></tr>';
+            }
+
+            // Add total word counts
+            html += '<tr><th>Total</th><th>' + totalBeforeWords + '</th><th>' + totalAfterWords + '</th></tr>';
+
+            html += '</table>';
+
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Function to split text into paragraphs
+        function splitIntoParagraphs(text) {
+            // Split by one or more newlines
+            var paragraphs = text.trim().split(/(?:\r?\n)+/);
+            return paragraphs.map(function(p) {
+                return p.trim();
+            }).filter(function(p) {
+                return p.length > 0;
+            });
+        }
+
+        // Function to count words in a paragraph
+        function countWords(paragraph) {
+            if (!paragraph) return 0;
+            var words = paragraph.trim().split(/\s+/);
+            return words.filter(function(word) {
+                return word.length > 0;
+            }).length;
+        }
+    </script>
+</body>
+</html>
